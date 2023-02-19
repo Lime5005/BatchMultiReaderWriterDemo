@@ -2,6 +2,7 @@ package com.example.springbatchmultireaderdemo.job;
 
 import com.example.springbatchmultireaderdemo.listener.MyJobListener;
 import com.example.springbatchmultireaderdemo.pojo.Customer;
+import com.example.springbatchmultireaderdemo.reader.MyRestartReader;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -11,6 +12,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
+import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 @Configuration
@@ -28,6 +29,10 @@ public class MultiFileReaderJob {
     private JobBuilderFactory jobBuilderFactory;
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    @Qualifier("myRestartReader")
+    private MyRestartReader myRestartReader;
 
     @Autowired
     @Qualifier("myMultiFileWriter")
@@ -57,33 +62,33 @@ public class MultiFileReaderJob {
     @Bean
     @StepScope
     public MultiResourceItemReader<Customer> multiFileReader() {
-        MultiResourceItemReader <Customer> reader = new MultiResourceItemReader<>();
-        reader.setDelegate(myFlatFileItemReader());
-        reader.setResources(fileResources);
+        MultiResourceItemReader<Customer> reader = new MultiResourceItemReader<>();
+        reader.setDelegate(myRestartReader);
+        reader.setResources(fileResources); // is not overridden, why ???
         return reader;
     }
 
 
-    @Bean
-    public FlatFileItemReader<Customer> myFlatFileItemReader() {
-        FlatFileItemReader<Customer> reader = new FlatFileItemReader<Customer>();
-        reader.setResource(new ClassPathResource("customer.txt"));
-        //reader.setLinesToSkip(1);
-        DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
-        tokenizer.setNames(new String[]{"id","fistName","lastName","birthday"});
-        DefaultLineMapper<Customer> mapper = new DefaultLineMapper<>();
-        mapper.setLineTokenizer(tokenizer);
-        mapper.setFieldSetMapper(fieldSet -> {
-            Customer customer = new Customer();
-            customer.setId(fieldSet.readLong("id"));
-            customer.setFirstName(fieldSet.readString("fistName"));
-            customer.setLastName(fieldSet.readString("lastName"));
-            customer.setBirthday(fieldSet.readString("birthday"));
-            return customer;
-        });
-        mapper.afterPropertiesSet();
-        reader.setLineMapper(mapper);
-        return reader;
-    }
+//    @Bean
+//    public FlatFileItemReader<Customer> myFlatFileItemReader() {
+//        FlatFileItemReader<Customer> reader = new FlatFileItemReader<Customer>();
+//        reader.setResource(new ClassPathResource("customer.txt"));
+//        //reader.setLinesToSkip(1);
+//        DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
+//        tokenizer.setNames(new String[]{"id","fistName","lastName","birthday"});
+//        DefaultLineMapper<Customer> mapper = new DefaultLineMapper<>();
+//        mapper.setLineTokenizer(tokenizer);
+//        mapper.setFieldSetMapper(fieldSet -> {
+//            Customer customer = new Customer();
+//            customer.setId(fieldSet.readLong("id"));
+//            customer.setFirstName(fieldSet.readString("fistName"));
+//            customer.setLastName(fieldSet.readString("lastName"));
+//            customer.setBirthday(fieldSet.readString("birthday"));
+//            return customer;
+//        });
+//        mapper.afterPropertiesSet();
+//        reader.setLineMapper(mapper);
+//        return reader;
+//    }
 
 }
