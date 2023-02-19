@@ -7,8 +7,8 @@ import org.springframework.core.io.Resource;
 
 @Data
 @NoArgsConstructor
-//public class Customer implements ResourceAware {
-public class Customer {
+public class Customer implements ResourceAware {
+//public class Customer {
     private Long id;
     private String firstName;
     private String lastName;
@@ -16,9 +16,9 @@ public class Customer {
     private String inputSrcFileName;
     private Resource resource;
 
-//    @Override
-//    public void setResource(Resource resource) {
-//        this.resource = resource;
-//        this.inputSrcFileName = resource.getFilename();
-//    }
+    @Override
+    public void setResource(Resource resource) {
+        this.resource = resource;
+        this.inputSrcFileName = resource.getFilename();
+    }
 }
