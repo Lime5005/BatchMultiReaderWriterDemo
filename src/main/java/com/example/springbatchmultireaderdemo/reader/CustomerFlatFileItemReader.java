@@ -7,23 +7,21 @@ import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-
-@Component("myRestartReader")
-//public class MyRestartReader implements ItemStreamReader<Customer>, ResourceAwareItemReaderItemStream<Customer> {
-public class MyRestartReader implements ResourceAwareItemReaderItemStream<Customer> {
+@Component
+public class CustomerFlatFileItemReader implements ResourceAwareItemReaderItemStream<Customer> {
 
     private final FlatFileItemReader<Customer> customerFlatFileItemReader = new FlatFileItemReader<>();
+    private String resource = "customer.csv";
     private Long currentLine = 0L;
     private boolean restart = false;
     private ExecutionContext executionContext;
 
-
-    public MyRestartReader() {
-
-        customerFlatFileItemReader.setResource(new ClassPathResource("file1.txt"));
+    public CustomerFlatFileItemReader() {
+        customerFlatFileItemReader.setResource(new FileSystemResource("classpath:/file3.txt"));
         customerFlatFileItemReader.setLinesToSkip(1);
 
         DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
@@ -42,6 +40,10 @@ public class MyRestartReader implements ResourceAwareItemReaderItemStream<Custom
         customerFlatFileItemReader.setLineMapper(mapper);
     }
 
+    @Override
+    public void setResource(Resource resource) {
+
+    }
 
     @Override
     public Customer read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
@@ -88,11 +90,6 @@ public class MyRestartReader implements ResourceAwareItemReaderItemStream<Custom
 
     @Override
     public void close() throws ItemStreamException {
-
-    }
-
-    @Override
-    public void setResource(Resource resource) {
 
     }
 }
