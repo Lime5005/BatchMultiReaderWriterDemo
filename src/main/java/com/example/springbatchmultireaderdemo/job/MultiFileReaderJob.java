@@ -2,7 +2,7 @@ package com.example.springbatchmultireaderdemo.job;
 
 import com.example.springbatchmultireaderdemo.listener.MyJobListener;
 import com.example.springbatchmultireaderdemo.pojo.Customer;
-import com.example.springbatchmultireaderdemo.reader.CustomerFlatFileItemReader;
+import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -14,8 +14,6 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,18 +22,14 @@ import org.springframework.core.io.Resource;
 
 @Configuration
 @EnableBatchProcessing
+@RequiredArgsConstructor
 public class MultiFileReaderJob {
-    @Autowired
-    private JobBuilderFactory jobBuilderFactory;
-    @Autowired
-    private StepBuilderFactory stepBuilderFactory;
 
-    @Autowired
-    private CustomerFlatFileItemReader customerFlatFileItemReader;
+    private final JobBuilderFactory jobBuilderFactory;
 
-    @Autowired
-    @Qualifier("myMultiFileWriter")
-    private ItemWriter<? super Customer> multiFileWriter;
+    private final StepBuilderFactory stepBuilderFactory;
+
+    private final ItemWriter<? super Customer> myMultiFileWriter;
 
     @Value("classpath:/file*.txt")
     private Resource[] fileResources;
@@ -50,18 +44,17 @@ public class MultiFileReaderJob {
 
     @Bean
     public Step multiFileItemReaderDemoStep() {
-
         return stepBuilderFactory.get("multiFileItemReaderDemoStep")
-                .<Customer,Customer>chunk(3)
+                .<Customer,Customer>chunk(20)
                 .reader(multiResourceItemReader())
-                .writer(multiFileWriter)
+                .writer(myMultiFileWriter)
                 .build();
     }
 
     @Bean
     @StepScope
-    public MultiResourceItemReader multiResourceItemReader() {
-        MultiResourceItemReader multiResourceItemReader = new MultiResourceItemReader();
+    public MultiResourceItemReader<Customer> multiResourceItemReader() {
+        MultiResourceItemReader<Customer> multiResourceItemReader = new MultiResourceItemReader<>();
         multiResourceItemReader.setDelegate(myFlatFileItemReader());
         multiResourceItemReader.setResources(fileResources);
         return multiResourceItemReader;
@@ -70,11 +63,11 @@ public class MultiFileReaderJob {
 
     @Bean
     public FlatFileItemReader<Customer> myFlatFileItemReader() {
-        FlatFileItemReader<Customer> reader = new FlatFileItemReader<Customer>();
+        FlatFileItemReader<Customer> reader = new FlatFileItemReader<>();
         reader.setResource(new ClassPathResource("customer.txt"));
         //reader.setLinesToSkip(1);
         DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
-        tokenizer.setNames(new String[]{"id","fistName","lastName","birthday"});
+        tokenizer.setNames("id","fistName","lastName","birthday");
         DefaultLineMapper<Customer> mapper = new DefaultLineMapper<>();
         mapper.setLineTokenizer(tokenizer);
         mapper.setFieldSetMapper(fieldSet -> {
