@@ -48,6 +48,7 @@ public class MyMultiFileWriter implements ItemStreamWriter<Customer> {
             writer = createMyItemWriter(fileName);
             delegates.put(fileName, writer);
         }
+        System.out.println("customer = " + customer);
         return writer;
     }
 
@@ -70,6 +71,7 @@ public class MyMultiFileWriter implements ItemStreamWriter<Customer> {
                     {
                         setNames(new String[]{"id", "firstName", "lastName", "birthday"});
                     }
+
                 });
             }
         });

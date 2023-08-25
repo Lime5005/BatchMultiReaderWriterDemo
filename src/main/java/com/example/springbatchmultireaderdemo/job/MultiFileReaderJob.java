@@ -12,12 +12,12 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
+import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 @Configuration
@@ -30,6 +30,7 @@ public class MultiFileReaderJob {
     private final StepBuilderFactory stepBuilderFactory;
 
     private final ItemWriter<? super Customer> myMultiFileWriter;
+    private final ResourceAwareItemReaderItemStream<Customer> customerFlatFileItemReader;
 
     @Value("classpath:/file*.txt")
     private Resource[] fileResources;
@@ -64,7 +65,6 @@ public class MultiFileReaderJob {
     @Bean
     public FlatFileItemReader<Customer> myFlatFileItemReader() {
         FlatFileItemReader<Customer> reader = new FlatFileItemReader<>();
-        reader.setResource(new ClassPathResource("customer.txt"));
         //reader.setLinesToSkip(1);
         DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
         tokenizer.setNames("id","fistName","lastName","birthday");
