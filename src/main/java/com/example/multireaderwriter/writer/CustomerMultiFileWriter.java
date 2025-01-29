@@ -5,6 +5,7 @@ import com.example.multireaderwriter.pojo.Customer;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component("customerMultiFileWriter")
@@ -31,12 +31,12 @@ public class CustomerMultiFileWriter implements ItemStreamWriter<Customer> {
 
 
     @Override
-    public void write(List<? extends Customer> items) throws Exception {
-        for (Customer customer : items) {
+    public void write(Chunk<? extends Customer> chunk) throws Exception {
+        for (Customer customer : chunk.getItems()) {
             if (customer == null) {
                 continue;
             }
-            getItemWriterForItem(customer).write(List.of(customer));
+            getItemWriterForItem(customer).write(Chunk.of(customer));
         }
     }
 

@@ -6,14 +6,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
@@ -21,11 +23,10 @@ import org.springframework.context.annotation.Configuration;
 public class MultiFileReaderWriterJob {
 
     private static final String JOB_NAME = "multiFileItemReaderWriterJob";
+    private static final String STEP_NAME = "multiFileItemReaderWriterJob";
     private static final int CHUNK_SIZE = 20;
-
-    private final JobBuilderFactory jobBuilderFactory;
-
-    private final StepBuilderFactory stepBuilderFactory;
+    private final JobRepository jobRepository;
+    private final PlatformTransactionManager transactionManager;
 
     private final MultiResourceItemReader<Customer> customerMultiResourceReader;
 
@@ -36,7 +37,7 @@ public class MultiFileReaderWriterJob {
 
     @Bean
     public Job multiFileItemReaderWriterJob() {
-        return jobBuilderFactory.get("multiFileItemReaderWriterJob")
+        return  new JobBuilder(JOB_NAME, jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(multiFileItemReaderWriterStep())
                 .listener(new CustomerJobListener())
@@ -45,8 +46,8 @@ public class MultiFileReaderWriterJob {
 
     @Bean
     public Step multiFileItemReaderWriterStep() {
-        return stepBuilderFactory.get("multiFileItemReaderWriterStep")
-                .<Customer,Customer>chunk(CHUNK_SIZE)
+        return new StepBuilder(STEP_NAME, jobRepository)
+                .<Customer,Customer>chunk(CHUNK_SIZE, transactionManager)
                 .reader(customerMultiResourceReader)
                 .processor(customerItemProcessor)
                 .writer(CustomerMultiFileWriter)
