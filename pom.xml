@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>springBatchMultiReaderDemo</artifactId>
+    <artifactId>springBatchMultiReaderWriter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springBatchMultiReaderDemo</name>
-    <description>springBatchMultiReaderDemo</description>
+    <name>springBatchMultiReaderWriter</name>
+    <description>springBatchMultiReaderWriter</description>
     <properties>
         <java.version>11</java.version>
     </properties>

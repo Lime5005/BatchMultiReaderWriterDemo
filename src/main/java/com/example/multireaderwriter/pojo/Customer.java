@@ -1,4 +1,4 @@
-package com.example.springbatchmultireaderdemo.pojo;
+package com.example.multireaderwriter.pojo;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,6 @@ import org.springframework.core.io.Resource;
 @Data
 @NoArgsConstructor
 public class Customer implements ResourceAware {
-//public class Customer {
     private Long id;
     private String firstName;
     private String lastName;

@@ -1,7 +1,8 @@
-package com.example.springbatchmultireaderdemo.writer;
+package com.example.multireaderwriter.writer;
 
 
-import com.example.springbatchmultireaderdemo.pojo.Customer;
+import com.example.multireaderwriter.pojo.Customer;
+import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ExecutionContext;
@@ -13,21 +14,20 @@ import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component("myMultiFileWriter")
-public class MyMultiFileWriter implements ItemStreamWriter<Customer> {
+@Component("customerMultiFileWriter")
+public class CustomerMultiFileWriter implements ItemStreamWriter<Customer> {
 
     private final Map<String, FlatFileItemWriter<Customer>> delegates = new HashMap<>();
 
     private ExecutionContext executionContext;
-    private boolean ignoreItemStream = false;
 
-    public void setIgnoreItemStream(boolean ignoreItemStream) {
-        this.ignoreItemStream = ignoreItemStream;
-    }
+    @Setter
+    private boolean ignoreItemStream = false;
 
 
     @Override
@@ -60,7 +60,11 @@ public class MyMultiFileWriter implements ItemStreamWriter<Customer> {
         String file = FilenameUtils.removeExtension(fileName);
         writer.setName(file + "Writer");
         FileSystemResource resource = new FileSystemResource("output/" + file + ".csv");
-        resource.getFile().createNewFile();
+        boolean fileCreated = resource.getFile().createNewFile();
+        if (!fileCreated) {
+            throw new IOException("Unable to create file at specified path. It already exists");
+        }
+
         writer.setResource(resource);
         writer.open(executionContext);
         writer.setAppendAllowed(true);

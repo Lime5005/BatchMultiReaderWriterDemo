@@ -1,10 +1,10 @@
-package com.example.springbatchmultireaderdemo;
+package com.example.multireaderwriter;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringBatchMultiReaderDemoApplicationTests {
+class SpringBatchMultiReaderWriterApplicationTests {
 
     @Test
     void contextLoads() {
