@@ -27,8 +27,7 @@ public class CustomerMultiFileWriter implements ItemStreamWriter<Customer> {
     private ExecutionContext executionContext;
 
     @Setter
-    private boolean ignoreItemStream = false;
-
+    private boolean ignoreItemStream = false; // An example for inserting a new logic
 
     @Override
     public void write(Chunk<? extends Customer> chunk) throws Exception {
@@ -105,5 +104,4 @@ public class CustomerMultiFileWriter implements ItemStreamWriter<Customer> {
             }
         }
     }
-
 }

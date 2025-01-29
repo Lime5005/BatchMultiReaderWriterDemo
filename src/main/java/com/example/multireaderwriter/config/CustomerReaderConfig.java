@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class CustomerJobConfig {
+public class CustomerReaderConfig {
 
     @Bean
     public FlatFileItemReader<Customer> customerReader() {
@@ -30,5 +30,4 @@ public class CustomerJobConfig {
         reader.setLineMapper(mapper);
         return reader;
     }
-
 }

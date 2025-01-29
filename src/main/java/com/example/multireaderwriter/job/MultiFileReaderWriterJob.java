@@ -25,7 +25,9 @@ public class MultiFileReaderWriterJob {
     private static final String JOB_NAME = "multiFileItemReaderWriterJob";
     private static final String STEP_NAME = "multiFileItemReaderWriterJob";
     private static final int CHUNK_SIZE = 20;
+
     private final JobRepository jobRepository;
+
     private final PlatformTransactionManager transactionManager;
 
     private final MultiResourceItemReader<Customer> customerMultiResourceReader;
@@ -53,5 +55,4 @@ public class MultiFileReaderWriterJob {
                 .writer(CustomerMultiFileWriter)
                 .build();
     }
-
 }
